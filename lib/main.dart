@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _setupAudioPlayer() async {
     try {
       String audioUrl =
-          '${AppConfig.baseUrl}/test/Cymatics%20-%20Lofi%20Vinyl%20Crackle%20Looped%206.wav';
+          '${AppConfig.baseUrl}/test/Cymatics%20-%20Rhodes%20Melody%20Loop%205%20-%2090%20BPM%20A%20Min.wav';
       await _audioPlayer.setAudioSource(AudioSource.uri(Uri.parse(audioUrl)));
     } catch (e, stackTrace) {
       if (kDebugMode) {
@@ -82,13 +82,25 @@ class _MyHomePageState extends State<MyHomePage> {
                 final processingState = playerState?.processingState;
                 final playing = playerState?.playing;
 
-                // Show a loading indicator while the player is preparing
+                // Show a loading indicator while the player is preparing.
                 if (processingState == ProcessingState.loading ||
                     processingState == ProcessingState.buffering) {
                   return const CircularProgressIndicator();
                 }
 
-                // If playing, show a pause button
+                // If the audio has finished, show a replay button.
+                if (processingState == ProcessingState.completed) {
+                  return IconButton(
+                    icon: const Icon(Icons.replay),
+                    iconSize: 64.0,
+                    onPressed: () => _audioPlayer.seek(
+                      Duration.zero,
+                      index: _audioPlayer.effectiveIndices.first,
+                    ),
+                  );
+                }
+
+                // If playing, show a pause button.
                 if (playing == true) {
                   return IconButton(
                     icon: const Icon(Icons.pause),
@@ -96,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     onPressed: _audioPlayer.pause,
                   );
                 } else {
-                  // Otherwise, show a play button
+                  // Otherwise (if paused or ready), show a play button.
                   return IconButton(
                     icon: const Icon(Icons.play_arrow),
                     iconSize: 64.0,
